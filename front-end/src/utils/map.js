@@ -1,3 +1,5 @@
+import EXIF from 'exif-js'
+
 export function initMap({ stoops, ref, center }) {
 	const map = new window.google.maps.Map(ref.current, {
 		center,
@@ -72,4 +74,32 @@ export function calculateDistance(lat1, lon1, lat2, lon2) {
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 	const distance = R * c
 	return distance
+}
+
+export const getExifLocation = (file) => {
+	return new Promise((resolve, reject) => {
+		EXIF.getData(file, function () {
+			const lat = EXIF.getTag(this, 'GPSLatitude')
+			const lon = EXIF.getTag(this, 'GPSLongitude')
+			const latRef = EXIF.getTag(this, 'GPSLatitudeRef')
+			const lonRef = EXIF.getTag(this, 'GPSLongitudeRef')
+
+			if (lat && lon && latRef && lonRef) {
+				const latitude = convertDMSToDD(lat[0], lat[1], lat[2], latRef)
+				const longitude = convertDMSToDD(lon[0], lon[1], lon[2], lonRef)
+				resolve({ lat: latitude, lng: longitude })
+			} else {
+				reject(new Error('No location data found in the image'))
+			}
+		})
+	})
+}
+
+const convertDMSToDD = (degrees, minutes, seconds, direction) => {
+	let dd = degrees + minutes / 60 + seconds / (60 * 60)
+
+	if (direction === 'S' || direction === 'W') {
+		dd = dd * -1
+	}
+	return dd
 }

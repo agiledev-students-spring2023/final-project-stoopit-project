@@ -1,5 +1,29 @@
 // mock data for map
 
+export const store_data = (
+	lat,
+	lng,
+	locationName,
+	title,
+	date,
+	image,
+	description
+) => {
+	const min = 1000000 // minimum 7-digit number
+	const max = 9999999 // maximum 7-digit number
+	const id = Math.floor(Math.random() * (max - min + 1)) + min
+	// add to db
+	Stoops.push({
+		id: id,
+		location: { lat: lat, lng: lng },
+		locationName: locationName,
+		title: title,
+		date: date,
+		image: image,
+		description: description
+	})
+}
+
 export const Stoops = [
 	{
 		id: '1234567',

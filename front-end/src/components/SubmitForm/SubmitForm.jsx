@@ -7,38 +7,9 @@ import SelectionMap from '../Maps/MapSelection/MapSelection'
 import ImgIcon from '../Icons/Img'
 import MapWrapper from '../../containers/MapWrapper'
 import mapContext from '../../context/map'
-import EXIF from 'exif-js'
-
+import { store_data } from '../../mockdata/db'
+import { getExifLocation } from '../../utils/maps'
 // TODO: finish extracting the location from the exif data
-const getExifLocation = (file) => {
-	return new Promise((resolve, reject) => {
-		EXIF.getData(file, function () {
-			const lat = EXIF.getTag(this, 'GPSLatitude')
-			const lon = EXIF.getTag(this, 'GPSLongitude')
-			const latRef = EXIF.getTag(this, 'GPSLatitudeRef')
-			const lonRef = EXIF.getTag(this, 'GPSLongitudeRef')
-
-			if (lat && lon && latRef && lonRef) {
-				const latitude = convertDMSToDD(lat[0], lat[1], lat[2], latRef)
-				const longitude = convertDMSToDD(lon[0], lon[1], lon[2], lonRef)
-				resolve({ lat: latitude, lng: longitude })
-			} else {
-				reject(new Error('No location data found in the image'))
-			}
-		})
-	})
-}
-
-const convertDMSToDD = (degrees, minutes, seconds, direction) => {
-	let dd = degrees + minutes / 60 + seconds / (60 * 60)
-
-	if (direction === 'S' || direction === 'W') {
-		dd = dd * -1
-	}
-	console.log(dd)
-	return dd
-}
-
 const SubmitForm = ({ imageBlob = undefined }) => {
 	const [selectedFile, setSelectedFile] = useState(imageBlob)
 	const [locationText, setLocationText] = useState(
@@ -236,6 +207,17 @@ const SubmitForm = ({ imageBlob = undefined }) => {
 							className="btn btn-primary btn-block"
 							id="stoopupload"
 							type="submit"
+							// onClick={() =>
+							// 	store_data(
+							// 		location.lat,
+							// 		location.lng,
+							// 		locationName = 'New York',
+							// 		title,
+							// 		date,
+							// 		image,
+							// 		description
+							// 	)
+							// }
 						>
 							Upload Stoop
 						</button>
