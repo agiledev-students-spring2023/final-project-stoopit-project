@@ -7,12 +7,60 @@ import SelectionMap from '../Maps/MapSelection/MapSelection'
 import ImgIcon from '../Icons/Img'
 import MapWrapper from '../../containers/MapWrapper'
 import mapContext from '../../context/map'
+import EXIF from 'exif-js'
+
+// TODO: finish extracting the location from the exif data
+const getExifLocation = (file) => {
+	return new Promise((resolve, reject) => {
+		EXIF.getData(file, function () {
+			const lat = EXIF.getTag(this, 'GPSLatitude')
+			const lon = EXIF.getTag(this, 'GPSLongitude')
+			const latRef = EXIF.getTag(this, 'GPSLatitudeRef')
+			const lonRef = EXIF.getTag(this, 'GPSLongitudeRef')
+
+			if (lat && lon && latRef && lonRef) {
+				const latitude = convertDMSToDD(lat[0], lat[1], lat[2], latRef)
+				const longitude = convertDMSToDD(lon[0], lon[1], lon[2], lonRef)
+				resolve({ lat: latitude, lng: longitude })
+			} else {
+				reject(new Error('No location data found in the image'))
+			}
+		})
+	})
+}
+
+const convertDMSToDD = (degrees, minutes, seconds, direction) => {
+	let dd = degrees + minutes / 60 + seconds / (60 * 60)
+
+	if (direction === 'S' || direction === 'W') {
+		dd = dd * -1
+	}
+	console.log(dd)
+	return dd
+}
 
 const SubmitForm = ({ imageBlob = undefined }) => {
-	const [selectedFile] = useState(imageBlob)
+	const [selectedFile, setSelectedFile] = useState(imageBlob)
+	const [locationText, setLocationText] = useState(
+		'Please use either button below to select location'
+	)
+
+	const handleFileChange = (e) => {
+		if (e.target.files.length > 0) {
+			const file = e.target.files[0]
+			setSelectedFile(file)
+
+			const reader = new FileReader()
+			reader.onloadend = () => {
+				setPreview(reader.result)
+			}
+			reader.readAsDataURL(file)
+		}
+	}
+
 	const [preview, setPreview] = useState()
 	const [showSelectionMap, setShowSelectionMap] = useState(false)
-	// const currentPosition = useLocationHook()
+	const [defaultLocation, setDefaultLocation] = useState(null) // Add this line
 	const { currentPosition } = useContext(mapContext)
 	const {
 		register,
@@ -33,6 +81,12 @@ const SubmitForm = ({ imageBlob = undefined }) => {
 
 	const handleGeoLocation = (loc) => {
 		setValue('location', `${loc.lat}, ${loc.lng}`)
+		setLocationText('Set')
+	}
+	const setMapLocation = (location) => {
+		handleShowSelectionMap()
+		handleGeoLocation(location)
+		setLocationText('Set')
 	}
 
 	useEffect(() => {
@@ -52,21 +106,19 @@ const SubmitForm = ({ imageBlob = undefined }) => {
 		// alert(JSON.stringify(`${res.message}, status: ${res.status}`));
 	}
 
-	const setMapLocation = (location) => {
-		handleShowSelectionMap()
-		handleGeoLocation(location)
-	}
-
 	useEffect(() => {
-		if (!selectedFile) {
-			setPreview(undefined)
-			return
+		if (selectedFile) {
+			getExifLocation(selectedFile)
+				.then((location) => {
+					setDefaultLocation(location)
+					setValue('location', `${location.lat}, ${location.lng}`)
+				})
+				.catch((error) => {
+					console.error(error)
+					setDefaultLocation(null)
+				})
 		}
-		const objectUrl = URL.createObjectURL(selectedFile)
-		setPreview(objectUrl)
-
-		return () => URL.revokeObjectURL(objectUrl)
-	}, [selectedFile])
+	}, [selectedFile, setValue])
 
 	return (
 		<div>
@@ -132,7 +184,7 @@ const SubmitForm = ({ imageBlob = undefined }) => {
 						<span>Location</span>
 						<input
 							id="stooploc"
-							placeholder="Please use either button below to select location"
+							placeholder={locationText}
 							className="input input-bordered input-warning"
 							type="text"
 							disabled

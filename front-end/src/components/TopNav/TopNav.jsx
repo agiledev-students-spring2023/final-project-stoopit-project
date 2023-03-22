@@ -46,6 +46,7 @@ const TopNav = ({ stoops, selectedRange, setSelectedRange }) => {
 					min="0"
 					max="10"
 					step="0.5"
+					defaultValue="5"
 					value={selectedRange}
 					onChange={handleRangeChange}
 					className="range"
