@@ -4,7 +4,6 @@
 	"description": "",
 	"main": "app.js",
 	"scripts": {
-		"prepare": "cd .. && husky install",
 		"test": "mocha tests/**/*.js --exit",
 		"start": "nodemon --ignore .json app.js",
 		"coverage": "nyc npm run test",
