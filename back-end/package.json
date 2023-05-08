@@ -1,0 +1,42 @@
+{
+	"name": "back-end",
+	"version": "1.0.0",
+	"description": "",
+	"main": "app.js",
+	"scripts": {
+		"prepare": "cd .. && husky install",
+		"test": "mocha tests/**/*.js --exit",
+		"dev": "nodemon --ignore .json app.js",
+		"start": "node app.js",
+		"coverage": "nyc npm run test",
+		"format": "cd ../ && npm run format"
+	},
+	"nodemonConfig": {
+		"ignore": [
+			"**/test/**",
+			"**/docs/**",
+			".json"
+		]
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"chai": "^4.3.7",
+		"mocha": "^10.2.0",
+		"nodemon": "^2.0.22",
+		"nyc": "^15.1.0",
+		"sinon": "^15.0.3"
+	},
+	"dependencies": {
+		"@aws-sdk/client-s3": "^3.326.0",
+		"chai-datetime": "^1.8.0",
+		"chai-http": "^4.3.0",
+		"cors": "^2.8.5",
+		"dotenv": "^16.0.3",
+		"express": "^4.18.2",
+		"express-fileupload": "^1.4.0",
+		"mongodb": "^5.2.0",
+		"mongoose": "^7.0.3",
+		"multer": "^1.4.5-lts.1"
+	}
+}

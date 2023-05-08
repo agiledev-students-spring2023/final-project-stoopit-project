@@ -39,6 +39,7 @@ Thumbs.db
 # Typical Node.js artifacts #
 #############################
 
+
 # Logs
 logs
 *.log
@@ -88,6 +89,7 @@ build/
 .pnp.js
 
 # dotconfig artifacts
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -124,3 +126,4 @@ typings/
 ## Jekyll artifacts
 **/.jekyll-cache
 **/_site/
+

@@ -1,0 +1,13 @@
+.app {
+	background-color: var(--base-100);
+	color: black;
+}
+
+.app > main {
+	padding-bottom: 4rem;
+	height: 100%;
+}
+
+.app > main:has(#map) {
+	padding-bottom: 0;
+}

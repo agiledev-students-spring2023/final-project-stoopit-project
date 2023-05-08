@@ -1,0 +1,14 @@
+footer {
+	height: 100%;
+	width: fit-content;
+}
+
+.btm-nav-icon {
+	background-color: var(--primary);
+	color: black;
+}
+
+.hide-input {
+	appearance: none;
+	display: none;
+}
